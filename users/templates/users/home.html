@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+
+        <div class="alert alert-success" role="alert">
+            <h3>Welcome {{ user.first_name }} {{ user.last_name }}!</h3>
+            {% if not user.doctors.first %}
+                <a href="{% url 'appointment' %}" class="btn btn-primary">Create Appointment</a>
+            {% endif %}
+            {% if user.doctors.first %}
+                <a href="{% url 'doctorData' %}" class="btn btn-primary">Update your data</a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+            {% if not user.doctors.first %}
+
+                <br><br>
+                <div class="col-sm-2">
+                    {% for field in  freeAppointmentForm %}
+                        {{ field }}
+                    {% endfor %}
+
+                </div>
+                <br>
+                <button class="btn btn-warning" onclick="return popItUp('/free-appointments/')">
+                    View Free Appointments
+                </button>
+            {% endif %}
+        </div>
+        <div class="fade-in">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-striped table-bordered datatable dataTable no-footer"
+                                   id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info"
+                                   style="border-collapse: collapse !important">
+                                <thead>
+                                <tr role="row">
+
+                                    <th class="sorting_asc" tabindex="0" aria-controls="DataTables_Table_0"
+                                        rowspan="1" colspan="1" aria-sort="ascending"
+                                        aria-label="Username: activate to sort column descending"
+                                        style="width: 222.922px;">
+                                        {% if not user.doctors.first %} Doctor {% else %} Patient {% endif %}
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                                        colspan="1" aria-label="Date registered: activate to sort column ascending"
+                                        style="width: 189.703px;">Date
+                                    </th>
+                                    <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                                        colspan="1" aria-label="Role: activate to sort column ascending"
+                                        style="width: 81.7656px;">Time
+                                    </th>
+                                    {% if not user.doctors.first %}
+                                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                                            colspan="1" aria-label="Actions: activate to sort column ascending"
+                                            style="width: 81.7656px;">Actions
+                                        </th>
+                                    {% endif %}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% if not user.doctors.first %}
+                                    {% for appointment in user.appointments.all %}
+
+                                        <tr role="row" class="odd">
+                                            <td>{{ user.user_doctors.first.doctor }}</td>
+                                            <td>{{ appointment.datetime.date }}</td>
+                                            <td>{{ appointment.datetime.time }}</td>
+                                            <td>
+                                                <a href="delete/{{ appointment.id }}" class="btn btn-danger"
+                                                   onclick=" return confirm('Are you sure you want to cancel this appointment?')">Cancel</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for user_doctor in user.doctors.first.user_doctors.all %}
+                                        {% for appointment in user_doctor.user.appointments.all %}
+                                            <tr role="row" class="odd">
+
+                                                <td>{{ user_doctor.user }}</td>
+                                                <td>{{ appointment.datetime.date }}</td>
+                                                <td>{{ appointment.datetime.time }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-success" role="alert">
+            <h3>Welcome!</h3>
+            <a href="{% url 'register' %}" class="btn btn-success">Signup</a>
+            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+        </div>
+    {% endif %}
+    <script>
+        function popItUp(url) {
+            window.open(url, '{{title}}', 'height=500,width=500');
+        }
+    </script>
+{% endblock content %}

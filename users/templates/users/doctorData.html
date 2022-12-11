@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>Update data here</h3>
+
+    <hr>
+    {% if user.is_authenticated %}
+        <form action="" method="POST">
+            {% csrf_token %}
+
+            {% for field in doctorForm %}
+                <div>
+                    <p>{{ field.label }}: <br> {{ field }}</p>
+
+                    {% for error in field.errors %}
+                        <small style="color: red">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary"
+                    onclick="return confirm('Are you sure you want to update these data?')">Update
+            </button>
+            <a href="{% url 'home' %}" class="btn btn-danger"> Go Back</a>
+        </form>
+    {% else %}
+        <p>You are not authenticated <a href="{% url 'login' %}"> Login here</a></p>
+
+    {% endif %}
+
+{% endblock content %}
+
